@@ -48,6 +48,7 @@ blockchain/soroban/.stellar
 vendor/rs-soroban-ultrahonk/target
 vendor/rs-soroban-ultrahonk/tests/*/target
 vendor/rs-soroban-ultrahonk/.git
+vendor/rs-soroban-ultrahonk
 vendor/arcade
 
 # local tooling
