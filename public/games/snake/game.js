@@ -24,6 +24,58 @@
   let snake = [];
   let touchStart = null;
   let keyboardActive = false;
+  let audioCtx = null;
+  let audioEnabled = false;
+
+  function ensureAudioReady() {
+    if (!audioCtx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        return false;
+      }
+      audioCtx = new AudioCtx();
+    }
+    if (audioCtx.state === "suspended") {
+      void audioCtx.resume();
+    }
+    audioEnabled = audioCtx.state === "running";
+    return audioEnabled;
+  }
+
+  function playTone({ type = "sine", from = 440, to = from, duration = 0.12, volume = 0.04 }) {
+    if (!ensureAudioReady()) {
+      return;
+    }
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(from, now);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(40, to), now + duration);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  }
+
+  function playStartSfx() {
+    playTone({ type: "triangle", from: 280, to: 420, duration: 0.14, volume: 0.04 });
+  }
+
+  function playEatSfx() {
+    playTone({ type: "square", from: 520, to: 740, duration: 0.08, volume: 0.03 });
+  }
+
+  function playTurnSfx() {
+    playTone({ type: "sine", from: 320, to: 300, duration: 0.035, volume: 0.015 });
+  }
+
+  function playGameOverSfx() {
+    playTone({ type: "sawtooth", from: 220, to: 90, duration: 0.22, volume: 0.05 });
+  }
 
   function resize() {
     const dpr = Math.max(1, window.devicePixelRatio || 1);
@@ -40,6 +92,9 @@
   function setDirection(nextX, nextY) {
     if (nextX === -direction.x && nextY === -direction.y) {
       return;
+    }
+    if (running && (nextX !== pendingDirection.x || nextY !== pendingDirection.y)) {
+      playTurnSfx();
     }
     pendingDirection = { x: nextX, y: nextY };
   }
@@ -73,6 +128,7 @@
     keyboardActive = true;
     canvas.focus();
     overlayEl.classList.add("hide");
+    playStartSfx();
   }
 
   function endRun(reason) {
@@ -87,6 +143,7 @@
     overlayTextEl.textContent = `${reason} Your score: ${score}. Tap restart for another run.`;
     startBtn.textContent = "Restart";
     overlayEl.classList.remove("hide");
+    playGameOverSfx();
   }
 
   function step() {
@@ -119,6 +176,7 @@
       score += 10;
       scoreEl.textContent = String(score);
       spawnFood();
+      playEatSfx();
       return;
     }
 
@@ -183,6 +241,9 @@
 
     document.addEventListener("keydown", (event) => {
       const key = event.key.toLowerCase();
+      if (controlKeys.has(key)) {
+        ensureAudioReady();
+      }
       if (controlKeys.has(key) && (keyboardActive || document.activeElement === canvas)) {
         event.preventDefault();
       }
@@ -208,6 +269,7 @@
 
     document.querySelectorAll("[data-dir]").forEach((button) => {
       button.addEventListener("pointerdown", () => {
+        ensureAudioReady();
         keyboardActive = true;
         canvas.focus();
         const dir = button.getAttribute("data-dir");
@@ -221,6 +283,7 @@
     canvas.addEventListener(
       "touchstart",
       (event) => {
+        ensureAudioReady();
         keyboardActive = true;
         canvas.focus();
         const touch = event.changedTouches[0];

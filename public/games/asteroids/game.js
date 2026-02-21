@@ -44,6 +44,72 @@
     respawnTimer: 0,
     lastTime: 0,
   };
+  let audioCtx = null;
+  let audioEnabled = false;
+
+  function ensureAudioReady() {
+    if (!audioCtx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) {
+        return false;
+      }
+      audioCtx = new AudioCtx();
+    }
+    if (audioCtx.state === "suspended") {
+      void audioCtx.resume();
+    }
+    audioEnabled = audioCtx.state === "running";
+    return audioEnabled;
+  }
+
+  function playTone({ type = "sine", from = 440, to = from, duration = 0.1, volume = 0.035 }) {
+    if (!ensureAudioReady()) {
+      return;
+    }
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    filter.type = "lowpass";
+    filter.frequency.value = 2800;
+    osc.type = type;
+    osc.frequency.setValueAtTime(from, now);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(30, to), now + duration);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + duration + 0.02);
+  }
+
+  function playStartSfx() {
+    playTone({ type: "triangle", from: 260, to: 440, duration: 0.16, volume: 0.045 });
+  }
+
+  function playShootSfx() {
+    playTone({ type: "square", from: 780, to: 520, duration: 0.06, volume: 0.028 });
+  }
+
+  function playExplosionSfx(size) {
+    const base = size === 3 ? 170 : size === 2 ? 230 : 300;
+    playTone({ type: "sawtooth", from: base * 2, to: base, duration: 0.12, volume: 0.042 });
+  }
+
+  function playShipHitSfx() {
+    playTone({ type: "sawtooth", from: 190, to: 90, duration: 0.2, volume: 0.05 });
+  }
+
+  function playLevelUpSfx() {
+    playTone({ type: "triangle", from: 360, to: 620, duration: 0.14, volume: 0.04 });
+  }
+
+  function playGameOverSfx() {
+    playTone({ type: "square", from: 260, to: 70, duration: 0.26, volume: 0.05 });
+  }
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -158,6 +224,7 @@
     spawnInitialAsteroids();
     updateHud();
     overlay.classList.add("hide");
+    playStartSfx();
   }
 
   function nextLevel() {
@@ -169,12 +236,14 @@
     state.ship.invulnerableMs = 1400;
     spawnInitialAsteroids();
     updateHud();
+    playLevelUpSfx();
   }
 
   function gameOver() {
     state.mode = STATE_GAME_OVER;
     playBtn.textContent = "Play Again";
     overlay.classList.remove("hide");
+    playGameOverSfx();
   }
 
   function explode(x, y, color, count) {
@@ -209,11 +278,13 @@
       life: 1.1,
     });
     state.fireCooldown = FIRE_COOLDOWN_MS;
+    playShootSfx();
   }
 
   function splitAsteroid(asteroid, hitIndex) {
     const points = asteroid.size === 3 ? 20 : asteroid.size === 2 ? 50 : 100;
     state.score += points;
+    playExplosionSfx(asteroid.size);
 
     explode(asteroid.x, asteroid.y, "#7ab6ff", asteroid.size === 3 ? 14 : 10);
 
@@ -236,6 +307,7 @@
     }
 
     explode(state.ship.x, state.ship.y, "#ff9a7a", 24);
+    playShipHitSfx();
     state.lives -= 1;
     updateHud();
 
@@ -513,6 +585,9 @@
 
     document.addEventListener("keydown", (event) => {
       const key = event.key.toLowerCase();
+      if (controlKeys.has(key)) {
+        ensureAudioReady();
+      }
       if (controlKeys.has(key) && (state.keyboardActive || document.activeElement === canvas)) {
         event.preventDefault();
       }
@@ -551,6 +626,7 @@
 
   function bindPointer() {
     canvas.addEventListener("pointerdown", (event) => {
+      ensureAudioReady();
       state.pointer.active = true;
       state.keyboardActive = true;
       canvas.focus();
@@ -583,6 +659,7 @@
       const control = button.getAttribute("data-control");
       const activate = (event) => {
         event.preventDefault();
+        ensureAudioReady();
         if (control === "fire") {
           if (state.mode === STATE_RUNNING) {
             fireBullet();
@@ -605,6 +682,7 @@
   }
 
   playBtn.addEventListener("click", () => {
+    ensureAudioReady();
     playBtn.textContent = "Play";
     startGame();
   });
