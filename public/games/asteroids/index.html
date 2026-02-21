@@ -104,7 +104,7 @@
 
       .control-grid {
         display: grid;
-        grid-template-columns: repeat(4, minmax(64px, 90px));
+        grid-template-columns: repeat(5, minmax(64px, 90px));
         gap: 8px;
       }
 
@@ -142,8 +142,9 @@
         <div class="pill">Score: <span id="score" class="score-value">0</span></div>
         <div class="pill">Lives: <span id="lives" class="score-value">3</span></div>
         <div class="pill">Level: <span id="level" class="score-value">1</span></div>
+        <div class="pill" id="runState">Running</div>
       </div>
-      <div class="pill">Keyboard, Mouse, or Touch Controls</div>
+      <div class="pill">Keyboard, Mouse, Touch + P</div>
     </div>
 
     <div class="overlay" id="overlay">
@@ -156,6 +157,7 @@
         <button type="button" data-control="thrust" aria-label="Thrust">Thrust</button>
         <button type="button" data-control="right" aria-label="Rotate right">Right</button>
         <button type="button" data-control="fire" aria-label="Fire">Fire</button>
+        <button type="button" data-control="pause" aria-label="Pause or resume game">Pause</button>
       </div>
     </div>
 

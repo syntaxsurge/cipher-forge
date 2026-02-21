@@ -3,22 +3,11 @@ import { Compass, Gamepad2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ARCADE_GAMES,
+  ARCADE_GAME_ICONS,
+} from "@/features/arcade/registry/arcadeGames";
 import { PublishedChallengesList } from "@/features/challenges/PublishedChallengesList";
-
-const gameModes = [
-  {
-    title: "Pong Duel",
-    summary: "Competitive arcade paddle duel",
-  },
-  {
-    title: "Snake Run",
-    summary: "Survival score challenge",
-  },
-  {
-    title: "Asteroids",
-    summary: "Arcade space survival run",
-  },
-];
 
 export default function ExplorePage() {
   return (
@@ -43,12 +32,18 @@ export default function ExplorePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3 md:grid-cols-3">
-            {gameModes.map((mode) => (
-              <div key={mode.title} className="rounded-md border bg-muted/30 p-3">
-                <p className="font-medium">{mode.title}</p>
-                <p className="text-sm text-muted-foreground">{mode.summary}</p>
-              </div>
-            ))}
+            {ARCADE_GAMES.map((mode) => {
+              const Icon = ARCADE_GAME_ICONS[mode.id];
+              return (
+                <div key={mode.id} className="rounded-md border bg-muted/30 p-3">
+                  <p className="inline-flex items-center gap-2 font-medium">
+                    <Icon className="h-4 w-4 text-primary" />
+                    {mode.title}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{mode.description}</p>
+                </div>
+              );
+            })}
             <div className="flex flex-wrap gap-2 md:col-span-3">
               <Button asChild variant="secondary" size="sm">
                 <Link href="/forge?tab=create">Create a new challenge</Link>

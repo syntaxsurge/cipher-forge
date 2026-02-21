@@ -1,3 +1,6 @@
+import type { LucideIcon } from "lucide-react";
+import { Rocket, Target, Zap } from "lucide-react";
+
 export type ArcadeGameId = "pong" | "snake" | "asteroids";
 
 export type ArcadeGame = {
@@ -35,3 +38,9 @@ export const ARCADE_GAMES: ArcadeGame[] = [
 export function getArcadeGame(id: string): ArcadeGame | null {
   return ARCADE_GAMES.find((game) => game.id === id) ?? null;
 }
+
+export const ARCADE_GAME_ICONS: Record<ArcadeGameId, LucideIcon> = {
+  pong: Target,
+  snake: Zap,
+  asteroids: Rocket,
+};

@@ -6,6 +6,7 @@
   const playerScoreEl = document.getElementById("playerScore");
   const aiScorePillEl = document.getElementById("aiScorePill");
   const playerScorePillEl = document.getElementById("playerScorePill");
+  const runStateEl = document.getElementById("runState");
   const overlayEl = document.getElementById("overlay");
   const overlayTitleEl = document.getElementById("overlayTitle");
   const overlayTextEl = document.getElementById("overlayText");
@@ -20,6 +21,7 @@
     playerTargetY: null,
     pointerActive: false,
     keyboardActive: false,
+    paused: false,
     aiSpeed: 460,
   };
 
@@ -90,6 +92,7 @@
 
   function startMatch() {
     STATE.running = true;
+    STATE.paused = false;
     STATE.aiScore = 0;
     STATE.playerScore = 0;
     aiScoreEl.textContent = "0";
@@ -102,15 +105,27 @@
     STATE.keyboardActive = true;
     resetBall(Math.random() > 0.5 ? 1 : -1);
     overlayEl.classList.add("hide");
+    runStateEl.textContent = "Running";
     playSfx(beepSfx);
   }
 
   function endMatch(playerWon) {
     STATE.running = false;
+    STATE.paused = false;
     overlayTitleEl.textContent = playerWon ? "You Win" : "AI Wins";
     overlayTextEl.textContent = `Final score ${STATE.playerScore} - ${STATE.aiScore}. Play again?`;
     startBtn.textContent = "Rematch";
     overlayEl.classList.remove("hide");
+    runStateEl.textContent = "Finished";
+    playSfx(beepSfx);
+  }
+
+  function togglePause() {
+    if (!STATE.running) {
+      return;
+    }
+    STATE.paused = !STATE.paused;
+    runStateEl.textContent = STATE.paused ? "Paused" : "Running";
     playSfx(beepSfx);
   }
 
@@ -139,7 +154,7 @@
   }
 
   function update(delta) {
-    if (!STATE.running) return;
+    if (!STATE.running || STATE.paused) return;
 
     if (STATE.pointerActive && STATE.playerTargetY !== null) {
       const dy = STATE.playerTargetY - game.playerY;
@@ -306,7 +321,7 @@
   }
 
   function bindKeyboard() {
-    const controlKeys = new Set(["arrowup", "arrowdown", "w", "s"]);
+    const controlKeys = new Set(["arrowup", "arrowdown", "w", "s", "p", "escape"]);
 
     document.addEventListener("keydown", (event) => {
       const key = event.key.toLowerCase();
@@ -318,6 +333,9 @@
       }
       if (key === "arrowdown" || key === "s") {
         STATE.playerInput = 1;
+      }
+      if (key === "p" || key === "escape") {
+        togglePause();
       }
     });
     document.addEventListener("keyup", (event) => {
@@ -344,6 +362,10 @@
       const control = button.getAttribute("data-control");
       button.addEventListener("pointerdown", (event) => {
         event.preventDefault();
+        if (control === "pause") {
+          togglePause();
+          return;
+        }
         STATE.playerInput = control === "up" ? -1 : 1;
       });
       button.addEventListener("pointerup", () => {
@@ -368,6 +390,7 @@
   bindPointer();
   bindKeyboard();
   bindMobileButtons();
+  runStateEl.textContent = "Ready";
   draw();
   requestAnimationFrame(loop);
 })();

@@ -8,6 +8,8 @@
   const overlayTitleEl = document.getElementById("overlayTitle");
   const overlayTextEl = document.getElementById("overlayText");
   const startBtn = document.getElementById("startBtn");
+  const pauseBtn = document.getElementById("pauseBtn");
+  const runStateEl = document.getElementById("runState");
 
   const STORAGE_KEY = "cipherforge_snake_best";
   const GRID_COLS = 28;
@@ -24,6 +26,7 @@
   let snake = [];
   let touchStart = null;
   let keyboardActive = false;
+  let paused = false;
   let audioCtx = null;
   let audioEnabled = false;
 
@@ -124,15 +127,19 @@
     scoreEl.textContent = "0";
     spawnFood();
     running = true;
+    paused = false;
     lastTick = performance.now();
     keyboardActive = true;
     canvas.focus();
     overlayEl.classList.add("hide");
+    pauseBtn.textContent = "Pause";
+    runStateEl.textContent = "Running";
     playStartSfx();
   }
 
   function endRun(reason) {
     running = false;
+    paused = false;
     if (score > bestScore) {
       bestScore = score;
       localStorage.setItem(STORAGE_KEY, String(bestScore));
@@ -143,7 +150,19 @@
     overlayTextEl.textContent = `${reason} Your score: ${score}. Tap restart for another run.`;
     startBtn.textContent = "Restart";
     overlayEl.classList.remove("hide");
+    pauseBtn.textContent = "Pause";
+    runStateEl.textContent = "Finished";
     playGameOverSfx();
+  }
+
+  function togglePause() {
+    if (!running) {
+      return;
+    }
+    paused = !paused;
+    pauseBtn.textContent = paused ? "Resume" : "Pause";
+    runStateEl.textContent = paused ? "Paused" : "Running";
+    playTone({ type: "triangle", from: paused ? 340 : 410, to: paused ? 260 : 520, duration: 0.08, volume: 0.025 });
   }
 
   function step() {
@@ -228,7 +247,7 @@
   }
 
   function frame(now) {
-    if (running && now - lastTick >= TICK_MS) {
+    if (running && !paused && now - lastTick >= TICK_MS) {
       lastTick = now;
       step();
     }
@@ -237,7 +256,7 @@
   }
 
   function bindControls() {
-    const controlKeys = new Set(["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d"]);
+    const controlKeys = new Set(["arrowup", "arrowdown", "arrowleft", "arrowright", "w", "a", "s", "d", "p", "escape"]);
 
     document.addEventListener("keydown", (event) => {
       const key = event.key.toLowerCase();
@@ -251,6 +270,7 @@
       if (key === "arrowdown" || key === "s") setDirection(0, 1);
       if (key === "arrowleft" || key === "a") setDirection(-1, 0);
       if (key === "arrowright" || key === "d") setDirection(1, 0);
+      if (key === "p" || key === "escape") togglePause();
     });
 
     document.addEventListener("keyup", (event) => {
@@ -311,11 +331,16 @@
   }
 
   startBtn.addEventListener("click", () => startRun());
+  pauseBtn.addEventListener("click", () => {
+    ensureAudioReady();
+    togglePause();
+  });
   window.addEventListener("resize", resize);
 
   bestEl.textContent = String(bestScore);
   resize();
   bindControls();
+  runStateEl.textContent = "Ready";
   draw();
   requestAnimationFrame(frame);
 })();

@@ -9,6 +9,7 @@ import {
   listPublishedChallengesRef,
   type DraftChallenge,
 } from "@/lib/convex/function-references";
+import { ARCADE_GAME_ICONS } from "@/features/arcade/registry/arcadeGames";
 import {
   Card,
   CardContent,
@@ -63,40 +64,47 @@ export function PublishedChallengesList() {
 
   return (
     <div className="space-y-3">
-      {challenges.map((challenge) => (
-        <Card key={challenge._id}>
-          <CardHeader>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <CardTitle className="max-w-full break-words text-balance">
-                {challenge.title}
-              </CardTitle>
-              <span className="rounded-full border px-2 py-1 text-xs uppercase tracking-wide text-muted-foreground">
-                {presetNames[challenge.gamePreset]}
-              </span>
-            </div>
-            <CardDescription>
-              Published {new Date(challenge.publishedAt ?? challenge.createdAt).toLocaleString()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <p className="break-words text-sm text-muted-foreground">
-              {challenge.description}
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Button asChild>
-                <Link href={`/forge/${challenge._id}/prove`}>Play challenge</Link>
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={() => void handleCopy(challenge._id)}
-              >
-                <Share2 className="h-4 w-4" />
-                Copy link
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+      {challenges.map((challenge) => {
+        const Icon = ARCADE_GAME_ICONS[challenge.gamePreset];
+        return (
+          <Card key={challenge._id}>
+            <CardHeader>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <CardTitle className="max-w-full break-words text-balance">
+                  {challenge.title}
+                </CardTitle>
+                <span className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs uppercase tracking-wide text-muted-foreground">
+                  <Icon className="h-3.5 w-3.5" />
+                  {presetNames[challenge.gamePreset]}
+                </span>
+              </div>
+              <CardDescription>
+                Published{" "}
+                {new Date(
+                  challenge.publishedAt ?? challenge.createdAt,
+                ).toLocaleString()}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="break-words text-sm text-muted-foreground">
+                {challenge.description}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button asChild>
+                  <Link href={`/forge/${challenge._id}/prove`}>Play challenge</Link>
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => void handleCopy(challenge._id)}
+                >
+                  <Share2 className="h-4 w-4" />
+                  Copy link
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

@@ -155,7 +155,8 @@
     <div class="hud">
       <div class="pill" id="aiScorePill">AI: <span id="aiScore" class="score-value">0</span></div>
       <div class="pill" id="playerScorePill">You: <span id="playerScore" class="score-value">0</span></div>
-      <div class="pill">Mouse/Touch + Arrow Keys</div>
+      <div class="pill" id="runState">Running</div>
+      <div class="pill">Mouse/Touch + Arrow Keys + P</div>
     </div>
 
     <div class="overlay" id="overlay">
@@ -169,6 +170,7 @@
     <div class="controls" id="controls">
       <button type="button" data-control="up" aria-label="Move paddle up">▲ Up</button>
       <button type="button" data-control="down" aria-label="Move paddle down">▼ Down</button>
+      <button type="button" data-control="pause" aria-label="Pause or resume game">⏸ Pause</button>
     </div>
 
     <script src="./game.js"></script>

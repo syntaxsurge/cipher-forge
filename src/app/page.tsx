@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { ArrowRight, Compass, Gamepad2, Sparkles, Swords } from "lucide-react";
+import {
+  ArrowRight,
+  Compass,
+  Gamepad2,
+  ShieldCheck,
+  Sparkles,
+  Swords,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -110,6 +117,49 @@ export default function HomePage() {
             </Card>
           ))}
         </div>
+      </section>
+
+      <section className="mt-12 space-y-4">
+        <h2 className="text-2xl font-semibold">Why ZK On Stellar</h2>
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">What ZK Means Here</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Players prove they know the private victory code without revealing
+                the code itself.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Why Stellar</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                The final result is settled on Stellar testnet so challenge outcomes
+                are verifiable and not dependent on trust in a single server.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">How CipherForge Uses ZK</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Draft creation stores only a commitment hash. The challenger later
+                generates the proof in-browser and submits it on-chain.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+        <p className="inline-flex items-center gap-2 rounded-md border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
+          <ShieldCheck className="h-3.5 w-3.5" />
+          No plaintext victory code is stored in Convex during draft creation.
+        </p>
       </section>
 
       <section className="mt-12 space-y-4">

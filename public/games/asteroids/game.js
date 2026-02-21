@@ -3,6 +3,7 @@
   const ctx = canvas.getContext("2d");
   const overlay = document.getElementById("overlay");
   const playBtn = document.getElementById("playBtn");
+  const runStateEl = document.getElementById("runState");
   const scoreEl = document.getElementById("score");
   const livesEl = document.getElementById("lives");
   const levelEl = document.getElementById("level");
@@ -40,6 +41,7 @@
       y: 0,
     },
     keyboardActive: false,
+    paused: false,
     fireCooldown: 0,
     respawnTimer: 0,
     lastTime: 0,
@@ -211,6 +213,7 @@
 
   function startGame() {
     state.mode = STATE_RUNNING;
+    state.paused = false;
     state.score = 0;
     state.lives = 3;
     state.level = 1;
@@ -224,6 +227,7 @@
     spawnInitialAsteroids();
     updateHud();
     overlay.classList.add("hide");
+    runStateEl.textContent = "Running";
     playStartSfx();
   }
 
@@ -241,9 +245,26 @@
 
   function gameOver() {
     state.mode = STATE_GAME_OVER;
+    state.paused = false;
     playBtn.textContent = "Play Again";
     overlay.classList.remove("hide");
+    runStateEl.textContent = "Finished";
     playGameOverSfx();
+  }
+
+  function togglePause() {
+    if (state.mode !== STATE_RUNNING) {
+      return;
+    }
+    state.paused = !state.paused;
+    runStateEl.textContent = state.paused ? "Paused" : "Running";
+    playTone({
+      type: "triangle",
+      from: state.paused ? 360 : 440,
+      to: state.paused ? 240 : 620,
+      duration: 0.09,
+      volume: 0.025,
+    });
   }
 
   function explode(x, y, color, count) {
@@ -545,7 +566,7 @@
     const deltaMs = Math.min(34, now - state.lastTime);
     state.lastTime = now;
 
-    if (state.mode === STATE_RUNNING) {
+    if (state.mode === STATE_RUNNING && !state.paused) {
       updateRunning(deltaMs);
     }
     draw();
@@ -585,7 +606,7 @@
   }
 
   function bindKeyboard() {
-    const controlKeys = new Set(["arrowleft", "arrowright", "arrowup", "a", "d", "w", " ", "enter"]);
+    const controlKeys = new Set(["arrowleft", "arrowright", "arrowup", "a", "d", "w", " ", "enter", "p", "escape"]);
 
     document.addEventListener("keydown", (event) => {
       const key = event.key.toLowerCase();
@@ -600,6 +621,9 @@
       if (key === "arrowup" || key === "w") state.keys.thrust = true;
       if (key === " " || key === "spacebar" || key === "enter") {
         state.keys.fire = true;
+      }
+      if (key === "p" || key === "escape") {
+        togglePause();
       }
     });
 
@@ -671,6 +695,10 @@
           state.keys.fire = true;
           return;
         }
+        if (control === "pause") {
+          togglePause();
+          return;
+        }
         setControl(control, true);
       };
       const deactivate = (event) => {
@@ -703,6 +731,7 @@
   bindPointer();
   bindButtons();
   updateHud();
+  runStateEl.textContent = "Ready";
   draw();
   requestAnimationFrame(frame);
 })();

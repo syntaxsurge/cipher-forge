@@ -10,6 +10,7 @@ import {
   publishDraftChallengeRef,
   type DraftChallenge,
 } from "@/lib/convex/function-references";
+import { ARCADE_GAME_ICONS } from "@/features/arcade/registry/arcadeGames";
 import {
   Card,
   CardContent,
@@ -138,6 +139,8 @@ function DraftCard({
   onPublish: (challengeId: string) => Promise<void>;
   onCopyShare: (challengeId: string) => Promise<void>;
 }) {
+  const Icon = ARCADE_GAME_ICONS[draft.gamePreset];
+
   return (
     <Card>
       <CardHeader>
@@ -146,7 +149,8 @@ function DraftCard({
             {draft.title}
           </CardTitle>
           <div className="flex items-center gap-2">
-            <span className="rounded-full border px-2 py-1 text-xs uppercase tracking-wide text-muted-foreground">
+            <span className="inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs uppercase tracking-wide text-muted-foreground">
+              <Icon className="h-3.5 w-3.5" />
               {presetNames[draft.gamePreset]}
             </span>
             <span

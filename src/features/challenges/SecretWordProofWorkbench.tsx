@@ -6,11 +6,11 @@ import { useQuery } from "convex/react";
 import {
   AlertTriangle,
   CheckCircle2,
-  Clock3,
   Clipboard,
   Gamepad2,
   Loader2,
   ShieldAlert,
+  ShieldCheck,
   Swords,
   Target,
 } from "lucide-react";
@@ -51,7 +51,6 @@ const PROOF_TIMEOUT_MS = 180_000;
 const PROOF_UI_GUARD_MS = 190_000;
 const PROVER_WARMUP_RETRY_LIMIT = 2;
 const MAX_LOCAL_ATTEMPTS = 12;
-const SESSION_WINDOW_SECONDS = 10 * 60;
 
 type GuessAttempt = {
   id: number;
@@ -141,17 +140,6 @@ function normalizeInputByPreset(
   return rawValue.trim();
 }
 
-function formatCountdown(secondsLeft: number) {
-  const clamped = Math.max(0, secondsLeft);
-  const minutes = Math.floor(clamped / 60)
-    .toString()
-    .padStart(2, "0");
-  const seconds = Math.floor(clamped % 60)
-    .toString()
-    .padStart(2, "0");
-  return `${minutes}:${seconds}`;
-}
-
 function toErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message.trim().length > 0) {
     return error.message;
@@ -212,7 +200,6 @@ export function SecretWordProofWorkbench({
   const [proverStatus, setProverStatus] = useState<ProverStatus>("idle");
   const [guessAttempts, setGuessAttempts] = useState<GuessAttempt[]>([]);
   const [isLocalGuessMatched, setIsLocalGuessMatched] = useState<boolean | null>(null);
-  const [clockNow, setClockNow] = useState(() => Date.now());
 
   useEffect(() => {
     let isMounted = true;
@@ -240,16 +227,6 @@ export function SecretWordProofWorkbench({
 
     return () => {
       isMounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const timerId = window.setInterval(() => {
-      setClockNow(Date.now());
-    }, 1000);
-
-    return () => {
-      window.clearInterval(timerId);
     };
   }, []);
 
@@ -520,20 +497,16 @@ export function SecretWordProofWorkbench({
     challenge.creatorAddress,
   );
   const sessionStarted = challenge.sessionId !== undefined && challenge.sessionId !== null;
-  const elapsedSeconds = sessionStarted
-    ? Math.floor((clockNow - challenge.createdAt) / 1000)
-    : 0;
-  const secondsLeft = SESSION_WINDOW_SECONDS - elapsedSeconds;
   const matchPhaseLabel = sessionStarted
     ? challenge.status === "settled"
-      ? "Settled"
-      : "Live Session"
-    : "Lobby";
+      ? "Settled on-chain"
+      : "Session open"
+    : "Pre-session";
   const selectedGame = getArcadeGame(challenge.gamePreset);
   const nextAction = !sessionStarted
-    ? "Start on-chain session as challenger."
+    ? "Play anytime. Start on-chain session when you are ready to settle."
     : isValidProof !== true
-      ? "Solve challenge and generate local ZK proof."
+      ? "Generate local ZK proof for this session."
       : "Submit proof on-chain to finalize.";
 
   return (
@@ -542,12 +515,26 @@ export function SecretWordProofWorkbench({
         <CardHeader>
           <CardTitle className="text-2xl">Arcade Proof Workbench</CardTitle>
           <CardDescription>
-            Solve privately, generate a proof, and settle this challenge on-chain.
+            Play the arcade game, generate a proof privately, then settle this
+            challenge on-chain.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="rounded-md border border-primary/35 bg-primary/10 px-3 py-2 text-xs text-primary">
-            Local proof generation does not require wallet connection. Wallet is only required for on-chain session start and proof submission.
+            Local proof generation does not require wallet connection. Wallet is
+            only required for on-chain session start and proof submission.
+          </div>
+
+          <div className="rounded-lg border bg-muted/20 p-3">
+            <p className="inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              Why ZK is used here
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              ZK lets the challenger prove they know the correct private victory
+              code without revealing it publicly. Stellar is used as the
+              settlement layer so anyone can verify the on-chain result.
+            </p>
           </div>
 
           <div className="grid gap-2 rounded-lg border bg-muted/30 p-3 text-sm text-muted-foreground">
@@ -580,7 +567,7 @@ export function SecretWordProofWorkbench({
             <div className="rounded-md border bg-muted/20 p-3">
               <p className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
                 <Swords className="h-3.5 w-3.5" />
-                Live Session
+                On-chain Session
               </p>
               <p className="mt-2 text-sm font-medium">
                 {sessionStarted
@@ -590,11 +577,11 @@ export function SecretWordProofWorkbench({
             </div>
             <div className="rounded-md border bg-muted/20 p-3">
               <p className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
-                <Clock3 className="h-3.5 w-3.5" />
-                Solve Window
+                <Gamepad2 className="h-3.5 w-3.5" />
+                Arcade Access
               </p>
               <p className="mt-2 text-sm font-medium">
-                {formatCountdown(secondsLeft)}
+                Always playable
               </p>
             </div>
             <div className="rounded-md border bg-muted/20 p-3">
@@ -699,7 +686,7 @@ export function SecretWordProofWorkbench({
               disabled={secretWord.trim().length === 0 || guessAttempts.length >= MAX_LOCAL_ATTEMPTS}
             >
               <Gamepad2 className="h-4 w-4" />
-              Check guess
+              Check victory code
             </Button>
             <Button
               onClick={() => void handleGenerateProof()}
@@ -861,8 +848,8 @@ export function SecretWordProofWorkbench({
         <CardHeader>
           <CardTitle className="text-lg">On-chain Settlement</CardTitle>
           <CardDescription>
-            Session IDs are auto-detected from challenge state once created by the
-            creator.
+            Session IDs are auto-detected from challenge state once a session is
+            created on-chain.
           </CardDescription>
         </CardHeader>
         <CardContent>

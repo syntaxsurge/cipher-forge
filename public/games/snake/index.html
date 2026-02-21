@@ -126,6 +126,12 @@
         gap: 8px;
       }
 
+      .controls-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
       .dpad button {
         border: 1px solid #335a86;
         border-radius: 12px;
@@ -162,8 +168,9 @@
       <div class="stats">
         <div class="pill">Score: <span id="score" class="score-value">0</span></div>
         <div class="pill">Best: <span id="best" class="score-value">0</span></div>
+        <div class="pill" id="runState">Running</div>
       </div>
-      <div class="pill">Arrow/WASD + Touch</div>
+      <div class="pill">Arrow/WASD + Touch + P</div>
     </div>
 
     <div class="overlay" id="overlay">
@@ -177,6 +184,7 @@
     </div>
 
     <div class="controls" id="controls">
+      <div class="controls-stack">
       <div class="dpad">
         <div class="blank"></div>
         <button type="button" data-dir="up" aria-label="Move up">▲</button>
@@ -184,6 +192,8 @@
         <button type="button" data-dir="left" aria-label="Move left">◀</button>
         <button type="button" data-dir="down" aria-label="Move down">▼</button>
         <button type="button" data-dir="right" aria-label="Move right">▶</button>
+      </div>
+      <button class="button" type="button" id="pauseBtn" aria-label="Pause or resume game">Pause</button>
       </div>
     </div>
 
