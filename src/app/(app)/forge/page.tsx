@@ -29,8 +29,8 @@ export default function ForgePage() {
             Creator Forge
           </CardTitle>
           <CardDescription>
-            Create arcade challenge drafts, publish/share them, and settle sessions
-            through the on-chain CipherForge contract.
+            Create arcade challenge drafts, publish/share them, and settle
+            sessions through the on-chain CipherForge contract.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -41,13 +41,13 @@ export default function ForgePage() {
           </div>
           <ol className="mt-4 grid gap-2 text-sm text-muted-foreground md:grid-cols-3">
             <li className="rounded-md border bg-muted/30 px-3 py-2">
-              1. Pick one arcade game preset and create a challenge draft.
+              1. Pick one arcade game preset and create a draft commitment.
             </li>
             <li className="rounded-md border bg-muted/30 px-3 py-2">
               2. Publish from My Drafts and copy the challenge link.
             </li>
             <li className="rounded-md border bg-muted/30 px-3 py-2">
-              3. Open the link with another wallet to play and submit proof.
+              3. Open the link with another wallet to play and generate/submit ZK proof.
             </li>
           </ol>
         </CardContent>
@@ -68,8 +68,9 @@ export default function ForgePage() {
             <CardHeader>
               <CardTitle>Draft a Challenge</CardTitle>
               <CardDescription>
-                Choose an arcade game preset, set the challenge key commitment,
-                then publish from the Drafts tab so it appears on Explore.
+                Choose an arcade game preset and set a private victory code.
+                Draft creation stores only the commitment hash. Proof generation
+                happens later on the challenge prove page.
               </CardDescription>
             </CardHeader>
             <CardContent>

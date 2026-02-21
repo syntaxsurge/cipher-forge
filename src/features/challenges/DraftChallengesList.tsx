@@ -178,6 +178,10 @@ function DraftCard({
         <p className="break-all rounded-md border bg-muted/40 px-3 py-2 font-mono text-xs text-muted-foreground">
           Commitment hash: {draft.expectedHashHex}
         </p>
+        <p className="text-xs text-muted-foreground">
+          Drafts store the commitment hash only. ZK proof is generated on the
+          challenge prove page.
+        </p>
 
         <div className="flex flex-wrap gap-2">
           <Button asChild variant="secondary">

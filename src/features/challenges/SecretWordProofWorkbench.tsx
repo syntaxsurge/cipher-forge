@@ -96,7 +96,7 @@ function toFriendlyProofError(rawMessage: string) {
     message.includes("unsatisfied") ||
     message.includes("cannot satisfy constraint")
   ) {
-    return "Incorrect secret input. Check the hint and required format, then try again.";
+    return "Incorrect victory code. Check the hint and required format, then try again.";
   }
 
   if (
@@ -359,9 +359,9 @@ export function SecretWordProofWorkbench({
       if (computedInputHash !== challenge.expectedHashHex.toLowerCase()) {
         setIsValidProof(false);
         setProofErrorMessage(
-          "Incorrect secret input for this challenge. Check the hint and try again.",
+          "Incorrect victory code for this challenge. Check the hint and try again.",
         );
-        toast.error("Incorrect secret input for this challenge.");
+        toast.error("Incorrect victory code for this challenge.");
         return;
       }
 
@@ -618,8 +618,8 @@ export function SecretWordProofWorkbench({
                 Play: {selectedGame.title}
               </p>
               <p className="text-xs text-muted-foreground">
-                Finish your run, then submit your challenge key proof below to settle
-                this on-chain session.
+                Finish your run, then submit your victory code proof below to
+                settle this on-chain session.
               </p>
               <ArcadeFrame
                 gameTitle={selectedGame.title}

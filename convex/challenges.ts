@@ -9,18 +9,18 @@ const gamePresetSchema = v.union(
 
 const inputRules = {
   pong: {
-    inputLabel: "Challenge key",
-    inputPlaceholder: "Enter a challenge key (1-16 printable chars)",
+    inputLabel: "Victory code",
+    inputPlaceholder: "Enter a private victory code (1-16 printable chars)",
     inputPattern: "^[\\x20-\\x7E]{1,16}$",
   },
   snake: {
-    inputLabel: "Challenge key",
-    inputPlaceholder: "Enter a challenge key (1-16 printable chars)",
+    inputLabel: "Victory code",
+    inputPlaceholder: "Enter a private victory code (1-16 printable chars)",
     inputPattern: "^[\\x20-\\x7E]{1,16}$",
   },
   asteroids: {
-    inputLabel: "Challenge key",
-    inputPlaceholder: "Enter a challenge key (1-16 printable chars)",
+    inputLabel: "Victory code",
+    inputPlaceholder: "Enter a private victory code (1-16 printable chars)",
     inputPattern: "^[\\x20-\\x7E]{1,16}$",
   },
 } as const;
@@ -37,6 +37,38 @@ function fallbackPresetFromLegacyTitle(title: string): GamePreset {
     return "asteroids";
   }
   return "pong";
+}
+
+function normalizeLegacyInputLabel(
+  inputLabel: string | undefined,
+  fallbackLabel: string,
+) {
+  if (!inputLabel || inputLabel.trim().length === 0) {
+    return fallbackLabel;
+  }
+
+  const normalized = inputLabel.trim().toLowerCase();
+  if (normalized === "challenge key") {
+    return fallbackLabel;
+  }
+
+  return inputLabel;
+}
+
+function normalizeLegacyInputPlaceholder(
+  inputPlaceholder: string | undefined,
+  fallbackPlaceholder: string,
+) {
+  if (!inputPlaceholder || inputPlaceholder.trim().length === 0) {
+    return fallbackPlaceholder;
+  }
+
+  const normalized = inputPlaceholder.trim().toLowerCase();
+  if (normalized === "enter a challenge key (1-16 printable chars)") {
+    return fallbackPlaceholder;
+  }
+
+  return inputPlaceholder;
 }
 
 function normalizeSecretChallenge(challenge: {
@@ -75,8 +107,11 @@ function normalizeSecretChallenge(challenge: {
     description: challenge.description,
     challengeType: "secret_word" as const,
     gamePreset,
-    inputLabel: challenge.inputLabel ?? rules.inputLabel,
-    inputPlaceholder: challenge.inputPlaceholder ?? rules.inputPlaceholder,
+    inputLabel: normalizeLegacyInputLabel(challenge.inputLabel, rules.inputLabel),
+    inputPlaceholder: normalizeLegacyInputPlaceholder(
+      challenge.inputPlaceholder,
+      rules.inputPlaceholder,
+    ),
     inputPattern: challenge.inputPattern ?? rules.inputPattern,
     hint: challenge.hint,
     expectedHashHex: challenge.expectedHashHex,

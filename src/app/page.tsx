@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const flowSteps = [
   {
-    title: "1. Create ZK challenge",
+    title: "1. Create challenge draft",
     description:
-      "Choose an arcade game preset, enter your challenge key, and generate a commitment hash draft.",
+      "Choose an arcade game preset, enter a private victory code, and store a commitment hash draft.",
   },
   {
     title: "2. Publish and share",
@@ -23,7 +23,7 @@ const flowSteps = [
   {
     title: "4. On-chain settlement",
     description:
-      "Creator starts session, challenger submits proof, and the game settles through Soroban contracts.",
+      "Challenger starts session, submits proof, and the game settles through Soroban contracts.",
   },
 ];
 
@@ -82,7 +82,7 @@ export default function HomePage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm text-muted-foreground">
             <p>Creator-owned challenges with clear publish/share lifecycle.</p>
-            <p>Interactive challenge modes with real secret input formats.</p>
+            <p>Draft commitments first, then full proof generation in solve flow.</p>
             <p>Proof generation and on-chain settlement shown in one flow.</p>
             <p>Judge mode with direct contract explorer verification links.</p>
           </CardContent>

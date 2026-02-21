@@ -24,7 +24,7 @@ const gamePresets = [
     title: "Pong Duel",
     description: "Competitive paddle rally challenge.",
     icon: Target,
-    placeholder: "Enter a challenge key (max 16 printable chars)",
+    placeholder: "Enter a private victory code (max 16 printable chars)",
     pattern: /^[\x20-\x7E]{1,16}$/u,
     patternMessage: "Use 1-16 printable characters.",
   },
@@ -33,7 +33,7 @@ const gamePresets = [
     title: "Snake Run",
     description: "Arcade survival score challenge.",
     icon: Zap,
-    placeholder: "Enter a challenge key (max 16 printable chars)",
+    placeholder: "Enter a private victory code (max 16 printable chars)",
     pattern: /^[\x20-\x7E]{1,16}$/u,
     patternMessage: "Use 1-16 printable characters.",
   },
@@ -42,7 +42,7 @@ const gamePresets = [
     title: "Asteroids",
     description: "Space survival score challenge.",
     icon: Rocket,
-    placeholder: "Enter a challenge key (max 16 printable chars)",
+    placeholder: "Enter a private victory code (max 16 printable chars)",
     pattern: /^[\x20-\x7E]{1,16}$/u,
     patternMessage: "Use 1-16 printable characters.",
   },
@@ -122,7 +122,7 @@ export function CreateDraftChallengeForm() {
     );
 
     if (!normalizedInput) {
-      toast.error("A secret input is required for this challenge.");
+      toast.error("A victory code is required for this challenge.");
       return;
     }
 
@@ -188,8 +188,9 @@ export function CreateDraftChallengeForm() {
           })}
         </div>
         <p className="text-xs text-muted-foreground">
-          Pick the arcade game first. The challenge key is converted into a ZK
-          commitment and verified later on the prove page.
+          Pick the arcade game first. This draft step stores only a commitment
+          hash for your private victory code. The actual ZK proof is generated
+          later on the prove page.
         </p>
       </fieldset>
 
@@ -240,7 +241,7 @@ export function CreateDraftChallengeForm() {
 
       <div className="space-y-2">
         <label htmlFor="challenge-key" className="text-sm font-medium">
-          {activePreset.title} challenge key
+          {activePreset.title} victory code
         </label>
         <Input
           id="challenge-key"
@@ -249,6 +250,9 @@ export function CreateDraftChallengeForm() {
           {...form.register("secretWord")}
         />
         <p className="text-xs text-muted-foreground">{activePreset.patternMessage}</p>
+        <p className="text-xs text-muted-foreground">
+          Stored as a commitment hash only. The plaintext value is never saved.
+        </p>
         <p className="text-sm text-destructive">
           {form.formState.errors.secretWord?.message}
         </p>
@@ -265,7 +269,7 @@ export function CreateDraftChallengeForm() {
             <Loader2 className="h-4 w-4 animate-spin" /> Creating...
           </>
         ) : (
-          "Create ZK Draft"
+          "Create Draft"
         )}
       </Button>
     </form>
