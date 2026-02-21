@@ -364,9 +364,13 @@
       const bullet = state.bullets[i];
       bullet.x += bullet.vx * delta;
       bullet.y += bullet.vy * delta;
-      wrapPosition(bullet, 2);
       bullet.life -= delta;
-      if (bullet.life <= 0) {
+      const outOfBounds =
+        bullet.x < 0 ||
+        bullet.x > state.width ||
+        bullet.y < 0 ||
+        bullet.y > state.height;
+      if (bullet.life <= 0 || outOfBounds) {
         state.bullets.splice(i, 1);
       }
     }
