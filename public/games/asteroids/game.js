@@ -2,11 +2,19 @@
   const canvas = document.getElementById("game");
   const ctx = canvas.getContext("2d");
   const overlay = document.getElementById("overlay");
+  const overlayTitleEl = document.getElementById("overlayTitle");
+  const overlayTextEl = document.getElementById("overlayText");
   const playBtn = document.getElementById("playBtn");
   const runStateEl = document.getElementById("runState");
   const scoreEl = document.getElementById("score");
   const livesEl = document.getElementById("lives");
   const levelEl = document.getElementById("level");
+  const gameDialog = window.CipherForgeGameDialog.create({
+    overlayEl: overlay,
+    titleEl: overlayTitleEl,
+    descriptionEl: overlayTextEl,
+    actionButtonEl: playBtn,
+  });
 
   const STATE_IDLE = "idle";
   const STATE_RUNNING = "running";
@@ -226,7 +234,7 @@
     canvas.focus();
     spawnInitialAsteroids();
     updateHud();
-    overlay.classList.add("hide");
+    gameDialog.hide();
     runStateEl.textContent = "Running";
     playStartSfx();
   }
@@ -246,22 +254,56 @@
   function gameOver() {
     state.mode = STATE_GAME_OVER;
     state.paused = false;
-    playBtn.textContent = "Play Again";
-    overlay.classList.remove("hide");
+    gameDialog.show({
+      title: "Game Over",
+      description: `Final score: ${state.score}. Start a new run.`,
+      actionLabel: "Play Again",
+      onAction: startGame,
+    });
     runStateEl.textContent = "Finished";
     playGameOverSfx();
+  }
+
+  function resumeGame() {
+    if (state.mode !== STATE_RUNNING || !state.paused) {
+      return;
+    }
+    state.paused = false;
+    runStateEl.textContent = "Running";
+    gameDialog.hide();
+    playTone({
+      type: "triangle",
+      from: 440,
+      to: 620,
+      duration: 0.09,
+      volume: 0.025,
+    });
   }
 
   function togglePause() {
     if (state.mode !== STATE_RUNNING) {
       return;
     }
-    state.paused = !state.paused;
-    runStateEl.textContent = state.paused ? "Paused" : "Running";
+    if (state.paused) {
+      resumeGame();
+      return;
+    }
+    state.paused = true;
+    runStateEl.textContent = "Paused";
+    state.keys.left = false;
+    state.keys.right = false;
+    state.keys.thrust = false;
+    state.keys.fire = false;
+    gameDialog.show({
+      title: "Paused",
+      description: "Asteroids is paused. Resume when ready.",
+      actionLabel: "Resume Mission",
+      onAction: resumeGame,
+    });
     playTone({
       type: "triangle",
-      from: state.paused ? 360 : 440,
-      to: state.paused ? 240 : 620,
+      from: 360,
+      to: 240,
       duration: 0.09,
       volume: 0.025,
     });
@@ -713,12 +755,6 @@
     });
   }
 
-  playBtn.addEventListener("click", () => {
-    ensureAudioReady();
-    playBtn.textContent = "Play";
-    startGame();
-  });
-
   window.addEventListener("resize", () => {
     resize();
     if (state.mode !== STATE_RUNNING) {
@@ -732,6 +768,16 @@
   bindButtons();
   updateHud();
   runStateEl.textContent = "Ready";
+  gameDialog.show({
+    title: "Asteroids",
+    description:
+      "Destroy asteroids, survive incoming waves, and protect your lives.",
+    actionLabel: "Play",
+    onAction: () => {
+      ensureAudioReady();
+      startGame();
+    },
+  });
   draw();
   requestAnimationFrame(frame);
 })();

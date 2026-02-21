@@ -80,6 +80,27 @@
         display: none;
       }
 
+      .panel {
+        width: min(92vw, 380px);
+        border: 1px solid #3d577a;
+        border-radius: 14px;
+        background: rgba(8, 16, 30, 0.94);
+        padding: 18px;
+        text-align: center;
+        color: #eaf5ff;
+      }
+
+      .panel h1 {
+        margin: 0 0 8px;
+        font-size: 24px;
+      }
+
+      .panel p {
+        margin: 0 0 14px;
+        font-size: 13px;
+        color: #b8d1ea;
+      }
+
       .button {
         border: 1px solid #69a7ff;
         border-radius: 12px;
@@ -148,7 +169,11 @@
     </div>
 
     <div class="overlay" id="overlay">
-      <button class="button" id="playBtn" type="button">Play</button>
+      <div class="panel">
+        <h1 id="overlayTitle">Asteroids</h1>
+        <p id="overlayText">Destroy asteroids, survive incoming waves, and protect your lives.</p>
+        <button class="button" id="playBtn" type="button">Play</button>
+      </div>
     </div>
 
     <div class="controls">
@@ -161,6 +186,7 @@
       </div>
     </div>
 
+    <script src="../shared/game-dialog.js"></script>
     <script src="./game.js"></script>
   </body>
 </html>

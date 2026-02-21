@@ -11,6 +11,12 @@
   const overlayTitleEl = document.getElementById("overlayTitle");
   const overlayTextEl = document.getElementById("overlayText");
   const startBtn = document.getElementById("startBtn");
+  const gameDialog = window.CipherForgeGameDialog.create({
+    overlayEl,
+    titleEl: overlayTitleEl,
+    descriptionEl: overlayTextEl,
+    actionButtonEl: startBtn,
+  });
 
   const WIN_SCORE = 7;
   const STATE = {
@@ -104,7 +110,7 @@
     canvas.focus();
     STATE.keyboardActive = true;
     resetBall(Math.random() > 0.5 ? 1 : -1);
-    overlayEl.classList.add("hide");
+    gameDialog.hide();
     runStateEl.textContent = "Running";
     playSfx(beepSfx);
   }
@@ -112,11 +118,23 @@
   function endMatch(playerWon) {
     STATE.running = false;
     STATE.paused = false;
-    overlayTitleEl.textContent = playerWon ? "You Win" : "AI Wins";
-    overlayTextEl.textContent = `Final score ${STATE.playerScore} - ${STATE.aiScore}. Play again?`;
-    startBtn.textContent = "Rematch";
-    overlayEl.classList.remove("hide");
+    gameDialog.show({
+      title: playerWon ? "You Win" : "AI Wins",
+      description: `Final score ${STATE.playerScore} - ${STATE.aiScore}. Ready for a rematch?`,
+      actionLabel: "Rematch",
+      onAction: startMatch,
+    });
     runStateEl.textContent = "Finished";
+    playSfx(beepSfx);
+  }
+
+  function resumeFromPause() {
+    if (!STATE.running || !STATE.paused) {
+      return;
+    }
+    STATE.paused = false;
+    runStateEl.textContent = "Running";
+    gameDialog.hide();
     playSfx(beepSfx);
   }
 
@@ -124,8 +142,19 @@
     if (!STATE.running) {
       return;
     }
-    STATE.paused = !STATE.paused;
-    runStateEl.textContent = STATE.paused ? "Paused" : "Running";
+    if (STATE.paused) {
+      resumeFromPause();
+      return;
+    }
+    STATE.paused = true;
+    STATE.playerInput = 0;
+    runStateEl.textContent = "Paused";
+    gameDialog.show({
+      title: "Paused",
+      description: "Match paused. Resume when ready.",
+      actionLabel: "Resume Match",
+      onAction: resumeFromPause,
+    });
     playSfx(beepSfx);
   }
 
@@ -380,10 +409,6 @@
     });
   }
 
-  startBtn.addEventListener("click", () => {
-    startBtn.textContent = "Start Match";
-    startMatch();
-  });
   window.addEventListener("resize", resize);
 
   resize();
@@ -391,6 +416,12 @@
   bindKeyboard();
   bindMobileButtons();
   runStateEl.textContent = "Ready";
+  gameDialog.show({
+    title: "Pong Duel",
+    description: "Reach 7 points first. Keep your paddle inside the arena.",
+    actionLabel: "Start Match",
+    onAction: startMatch,
+  });
   draw();
   requestAnimationFrame(loop);
 })();

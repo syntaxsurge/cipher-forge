@@ -10,6 +10,12 @@
   const startBtn = document.getElementById("startBtn");
   const pauseBtn = document.getElementById("pauseBtn");
   const runStateEl = document.getElementById("runState");
+  const gameDialog = window.CipherForgeGameDialog.create({
+    overlayEl,
+    titleEl: overlayTitleEl,
+    descriptionEl: overlayTextEl,
+    actionButtonEl: startBtn,
+  });
 
   const STORAGE_KEY = "cipherforge_snake_best";
   const GRID_COLS = 28;
@@ -131,7 +137,7 @@
     lastTick = performance.now();
     keyboardActive = true;
     canvas.focus();
-    overlayEl.classList.add("hide");
+    gameDialog.hide();
     pauseBtn.textContent = "Pause";
     runStateEl.textContent = "Running";
     playStartSfx();
@@ -146,23 +152,58 @@
       bestEl.textContent = String(bestScore);
     }
 
-    overlayTitleEl.textContent = "Game Over";
-    overlayTextEl.textContent = `${reason} Your score: ${score}. Tap restart for another run.`;
-    startBtn.textContent = "Restart";
-    overlayEl.classList.remove("hide");
+    gameDialog.show({
+      title: "Game Over",
+      description: `${reason} Your score: ${score}. Start another run.`,
+      actionLabel: "Restart",
+      onAction: startRun,
+    });
     pauseBtn.textContent = "Pause";
     runStateEl.textContent = "Finished";
     playGameOverSfx();
+  }
+
+  function resumeRun() {
+    if (!running || !paused) {
+      return;
+    }
+    paused = false;
+    pauseBtn.textContent = "Pause";
+    runStateEl.textContent = "Running";
+    gameDialog.hide();
+    playTone({
+      type: "triangle",
+      from: 410,
+      to: 520,
+      duration: 0.08,
+      volume: 0.025,
+    });
   }
 
   function togglePause() {
     if (!running) {
       return;
     }
-    paused = !paused;
-    pauseBtn.textContent = paused ? "Resume" : "Pause";
-    runStateEl.textContent = paused ? "Paused" : "Running";
-    playTone({ type: "triangle", from: paused ? 340 : 410, to: paused ? 260 : 520, duration: 0.08, volume: 0.025 });
+    if (paused) {
+      resumeRun();
+      return;
+    }
+    paused = true;
+    pauseBtn.textContent = "Resume";
+    runStateEl.textContent = "Paused";
+    gameDialog.show({
+      title: "Paused",
+      description: "Snake Run is paused. Continue when ready.",
+      actionLabel: "Resume Run",
+      onAction: resumeRun,
+    });
+    playTone({
+      type: "triangle",
+      from: 340,
+      to: 260,
+      duration: 0.08,
+      volume: 0.025,
+    });
   }
 
   function step() {
@@ -330,7 +371,6 @@
     );
   }
 
-  startBtn.addEventListener("click", () => startRun());
   pauseBtn.addEventListener("click", () => {
     ensureAudioReady();
     togglePause();
@@ -341,6 +381,13 @@
   resize();
   bindControls();
   runStateEl.textContent = "Ready";
+  gameDialog.show({
+    title: "Snake Run",
+    description:
+      "Survive as long as possible. Hit a wall or your own tail and the run ends.",
+    actionLabel: "Start Run",
+    onAction: startRun,
+  });
   draw();
   requestAnimationFrame(frame);
 })();
