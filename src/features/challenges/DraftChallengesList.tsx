@@ -169,12 +169,6 @@ function DraftCard({
           <p className="text-sm text-muted-foreground">No description provided.</p>
         )}
 
-        {draft.hint ? (
-          <p className="break-words text-xs text-muted-foreground">
-            Hint: {draft.hint}
-          </p>
-        ) : null}
-
         <p className="break-all rounded-md border bg-muted/40 px-3 py-2 font-mono text-xs text-muted-foreground">
           Commitment hash: {draft.expectedHashHex}
         </p>

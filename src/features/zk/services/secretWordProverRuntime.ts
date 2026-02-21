@@ -64,7 +64,7 @@ function formatProofExecutionError(error: unknown): Error {
     message.includes("witness")
   ) {
     return new Error(
-      "Incorrect victory code for this challenge. Check the hint and required format, then try again.",
+      "Incorrect victory code for this challenge. Check the required format and try again.",
     );
   }
 

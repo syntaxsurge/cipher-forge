@@ -96,7 +96,7 @@ function toFriendlyProofError(rawMessage: string) {
     message.includes("unsatisfied") ||
     message.includes("cannot satisfy constraint")
   ) {
-    return "Incorrect victory code. Check the hint and required format, then try again.";
+    return "Incorrect victory code. Check the required format and try again.";
   }
 
   if (
@@ -359,7 +359,7 @@ export function SecretWordProofWorkbench({
       if (computedInputHash !== challenge.expectedHashHex.toLowerCase()) {
         setIsValidProof(false);
         setProofErrorMessage(
-          "Incorrect victory code for this challenge. Check the hint and try again.",
+          "Incorrect victory code for this challenge. Check the required format and try again.",
         );
         toast.error("Incorrect victory code for this challenge.");
         return;
@@ -563,12 +563,6 @@ export function SecretWordProofWorkbench({
               <span className="font-medium text-foreground">Status:</span>{" "}
               {challenge.status}
             </p>
-            {challenge.hint ? (
-              <p>
-                <span className="font-medium text-foreground">Hint:</span>{" "}
-                {challenge.hint}
-              </p>
-            ) : null}
             <p>
               <span className="font-medium text-foreground">Match phase:</span>{" "}
               {matchPhaseLabel}

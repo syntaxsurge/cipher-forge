@@ -59,7 +59,6 @@ const createDraftSchema = z.object({
   gamePreset: gamePresetSchema,
   title: z.string().trim().min(3, "Title should be at least 3 characters.").max(80),
   description: z.string().trim().max(1200),
-  hint: z.string().trim().max(120).optional(),
   secretWord: z.string(),
 });
 
@@ -69,7 +68,6 @@ const defaultValues: CreateDraftFormValues = {
   gamePreset: "pong",
   title: "",
   description: "",
-  hint: "",
   secretWord: "",
 };
 
@@ -137,7 +135,6 @@ export function CreateDraftChallengeForm() {
       await createSecretWordDraft({
         title: values.title,
         description: values.description,
-        hint: values.hint?.trim() || undefined,
         expectedHashHex: hashSecretWord(normalizedInput),
         gamePreset: values.gamePreset,
       });
@@ -211,32 +208,20 @@ export function CreateDraftChallengeForm() {
 
       <div className="space-y-2">
         <label htmlFor="challenge-description" className="text-sm font-medium">
-          Description
+          Challenge description (optional)
         </label>
         <Textarea
           id="challenge-description"
           rows={5}
-          placeholder="Describe the rules and solve window for challengers."
+          placeholder="Add theme, difficulty, or match context for challengers."
           {...form.register("description")}
         />
         <p className="text-sm text-destructive">
           {form.formState.errors.description?.message}
         </p>
         <p className="text-xs text-muted-foreground">
-          Explain win condition, any rules, and who this challenge is for.
+          Rules are fixed by the selected arcade game. Use this for flavor and context.
         </p>
-      </div>
-
-      <div className="space-y-2">
-        <label htmlFor="challenge-hint" className="text-sm font-medium">
-          Public hint (optional)
-        </label>
-        <Input
-          id="challenge-hint"
-          placeholder="Example: starts with C"
-          {...form.register("hint")}
-        />
-        <p className="text-sm text-destructive">{form.formState.errors.hint?.message}</p>
       </div>
 
       <div className="space-y-2">

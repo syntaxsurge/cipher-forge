@@ -12,6 +12,7 @@ export default defineSchema({
         v.literal("pong"),
         v.literal("snake"),
         v.literal("asteroids"),
+        v.literal("word_cipher"),
       ),
     ),
     inputLabel: v.optional(v.string()),

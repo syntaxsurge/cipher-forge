@@ -82,11 +82,6 @@ export function PublishedChallengesList() {
             <p className="break-words text-sm text-muted-foreground">
               {challenge.description}
             </p>
-            {challenge.hint ? (
-              <p className="break-words text-xs text-muted-foreground">
-                Hint: {challenge.hint}
-              </p>
-            ) : null}
             <div className="flex flex-wrap gap-2">
               <Button asChild>
                 <Link href={`/forge/${challenge._id}/prove`}>Play challenge</Link>

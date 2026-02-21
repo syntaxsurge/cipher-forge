@@ -26,6 +26,7 @@ const inputRules = {
 } as const;
 
 type GamePreset = keyof typeof inputRules;
+type StoredGamePreset = GamePreset | "word_cipher";
 type LifecycleStatus = "draft" | "published" | "settled";
 
 function fallbackPresetFromLegacyTitle(title: string): GamePreset {
@@ -37,6 +38,17 @@ function fallbackPresetFromLegacyTitle(title: string): GamePreset {
     return "asteroids";
   }
   return "pong";
+}
+
+function normalizeStoredGamePreset(
+  gamePreset: StoredGamePreset | undefined,
+  title: string,
+): GamePreset {
+  if (!gamePreset || gamePreset === "word_cipher") {
+    return fallbackPresetFromLegacyTitle(title);
+  }
+
+  return gamePreset;
 }
 
 function normalizeLegacyInputLabel(
@@ -78,11 +90,10 @@ function normalizeSecretChallenge(challenge: {
   title: string;
   description: string;
   challengeType: "standard" | "secret_word";
-  gamePreset?: GamePreset;
+  gamePreset?: StoredGamePreset;
   inputLabel?: string;
   inputPlaceholder?: string;
   inputPattern?: string;
-  hint?: string;
   expectedHashHex?: string;
   status?: LifecycleStatus;
   publishedAt?: number;
@@ -96,7 +107,10 @@ function normalizeSecretChallenge(challenge: {
     return null;
   }
 
-  const gamePreset = challenge.gamePreset ?? fallbackPresetFromLegacyTitle(challenge.title);
+  const gamePreset = normalizeStoredGamePreset(
+    challenge.gamePreset,
+    challenge.title,
+  );
   const rules = inputRules[gamePreset];
 
   return {
@@ -113,7 +127,6 @@ function normalizeSecretChallenge(challenge: {
       rules.inputPlaceholder,
     ),
     inputPattern: challenge.inputPattern ?? rules.inputPattern,
-    hint: challenge.hint,
     expectedHashHex: challenge.expectedHashHex,
     status: challenge.status ?? "draft",
     publishedAt: challenge.publishedAt,
@@ -137,7 +150,6 @@ export const createSecretWordDraft = mutationGeneric({
   args: {
     title: v.string(),
     description: v.string(),
-    hint: v.optional(v.string()),
     expectedHashHex: v.string(),
     gamePreset: gamePresetSchema,
   },
@@ -158,7 +170,6 @@ export const createSecretWordDraft = mutationGeneric({
       inputLabel: presetRules.inputLabel,
       inputPlaceholder: presetRules.inputPlaceholder,
       inputPattern: presetRules.inputPattern,
-      hint: args.hint?.trim() ? args.hint.trim() : undefined,
       expectedHashHex: ensureValidHash(args.expectedHashHex),
       status: "draft",
       createdAt: Date.now(),
@@ -204,8 +215,7 @@ export const publishDraft = mutationGeneric({
 
     await ctx.db.patch(challenge._id, {
       status: "published",
-      gamePreset:
-        challenge.gamePreset ?? fallbackPresetFromLegacyTitle(challenge.title),
+      gamePreset: normalizeStoredGamePreset(challenge.gamePreset, challenge.title),
       publishedAt: Date.now(),
     });
 
