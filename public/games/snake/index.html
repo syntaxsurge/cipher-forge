@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>Snake Run</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: radial-gradient(circle at 20% 20%, #18253f 0%, #070b14 60%);
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      }
+
+      .hud {
+        position: fixed;
+        inset: 0 0 auto 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        color: #dff4ff;
+        pointer-events: none;
+        z-index: 4;
+      }
+
+      .stats {
+        display: flex;
+        gap: 10px;
+      }
+
+      .pill {
+        border: 1px solid #335a86;
+        background: rgba(5, 15, 30, 0.8);
+        border-radius: 999px;
+        padding: 9px 14px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .pill .score-value {
+        display: inline-block;
+        min-width: 28px;
+        text-align: center;
+        font-size: 23px;
+        font-weight: 800;
+      }
+
+      #game {
+        position: fixed;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        display: block;
+        outline: none;
+      }
+
+      .overlay {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        background: rgba(5, 10, 18, 0.66);
+        z-index: 5;
+      }
+
+      .panel {
+        width: min(92vw, 360px);
+        border: 1px solid #39638f;
+        background: rgba(4, 12, 24, 0.95);
+        border-radius: 16px;
+        padding: 18px;
+        color: #e8f5ff;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      }
+
+      .panel h1 {
+        margin: 0 0 8px;
+        font-size: 22px;
+      }
+
+      .panel p {
+        margin: 0 0 14px;
+        color: #b8d4eb;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
+      .button {
+        border: 1px solid #4ea0ff;
+        background: linear-gradient(180deg, #1f6fd4 0%, #134d97 100%);
+        color: #f2fbff;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .controls {
+        position: fixed;
+        inset: auto 0 14px 0;
+        display: flex;
+        justify-content: center;
+        z-index: 6;
+        user-select: none;
+      }
+
+      .dpad {
+        display: grid;
+        grid-template-columns: repeat(3, 56px);
+        grid-template-rows: repeat(2, 56px);
+        gap: 8px;
+      }
+
+      .dpad button {
+        border: 1px solid #335a86;
+        border-radius: 12px;
+        background: rgba(7, 20, 38, 0.9);
+        color: #d7eeff;
+        font-size: 20px;
+        font-weight: 700;
+        cursor: pointer;
+        touch-action: none;
+      }
+
+      .dpad .blank {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .hide {
+        display: none;
+      }
+
+      @media (min-width: 880px) {
+        .controls {
+          right: 18px;
+          left: auto;
+          bottom: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="game" tabindex="0" aria-label="Snake Run game canvas"></canvas>
+
+    <div class="hud">
+      <div class="stats">
+        <div class="pill">Score: <span id="score" class="score-value">0</span></div>
+        <div class="pill">Best: <span id="best" class="score-value">0</span></div>
+      </div>
+      <div class="pill">Arrow/WASD + Touch</div>
+    </div>
+
+    <div class="overlay" id="overlay">
+      <div class="panel">
+        <h1 id="overlayTitle">Snake Run</h1>
+        <p id="overlayText">
+          Survive as long as possible. Hit a wall or your own tail and the run ends.
+        </p>
+        <button class="button" id="startBtn" type="button">Start Run</button>
+      </div>
+    </div>
+
+    <div class="controls" id="controls">
+      <div class="dpad">
+        <div class="blank"></div>
+        <button type="button" data-dir="up" aria-label="Move up">▲</button>
+        <div class="blank"></div>
+        <button type="button" data-dir="left" aria-label="Move left">◀</button>
+        <button type="button" data-dir="down" aria-label="Move down">▼</button>
+        <button type="button" data-dir="right" aria-label="Move right">▶</button>
+      </div>
+    </div>
+
+    <script src="./game.js"></script>
+  </body>
+</html>

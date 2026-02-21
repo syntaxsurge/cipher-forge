@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 205 42% 98%;
+  --foreground: 220 29% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 29% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 29% 12%;
+  --primary: 15 86% 48%;
+  --primary-foreground: 20 24% 96%;
+  --secondary: 213 42% 94%;
+  --secondary-foreground: 220 31% 14%;
+  --muted: 210 36% 94%;
+  --muted-foreground: 218 14% 38%;
+  --accent: 177 40% 90%;
+  --accent-foreground: 176 33% 18%;
+  --destructive: 0 72% 52%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 216 24% 84%;
+  --input: 216 24% 84%;
+  --ring: 15 78% 46%;
+  --radius: 0.7rem;
+}
+
+.dark {
+  --background: 220 23% 9%;
+  --foreground: 210 33% 96%;
+  --card: 220 20% 12%;
+  --card-foreground: 210 33% 96%;
+  --popover: 221 22% 11%;
+  --popover-foreground: 210 33% 96%;
+  --primary: 26 93% 58%;
+  --primary-foreground: 220 25% 10%;
+  --secondary: 219 17% 18%;
+  --secondary-foreground: 210 30% 92%;
+  --muted: 219 18% 15%;
+  --muted-foreground: 216 14% 72%;
+  --accent: 180 29% 18%;
+  --accent-foreground: 181 38% 84%;
+  --destructive: 0 72% 52%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 217 18% 26%;
+  --input: 217 18% 26%;
+  --ring: 26 93% 58%;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground;
+  min-height: 100vh;
+  font-family: var(--font-space), "Space Grotesk", system-ui, sans-serif;
+  background-image:
+    radial-gradient(circle at 15% -20%, hsl(var(--primary) / 0.18), transparent 38%),
+    radial-gradient(circle at 85% 10%, hsl(var(--accent-foreground) / 0.12), transparent 35%),
+    radial-gradient(circle at 50% 120%, hsl(var(--secondary-foreground) / 0.08), transparent 34%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(var(--background)) 55%, hsl(206 40% 96%) 100%);
+}
+
+.dark body {
+  background-image:
+    radial-gradient(circle at 15% -20%, hsl(var(--primary) / 0.24), transparent 45%),
+    radial-gradient(circle at 85% 10%, hsl(var(--accent-foreground) / 0.2), transparent 40%),
+    radial-gradient(circle at 50% 120%, hsl(var(--secondary-foreground) / 0.15), transparent 42%),
+    linear-gradient(180deg, hsl(var(--background)), hsl(220 24% 8%));
+}
+
+main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.15;
+  background-size: 18px 18px;
+  background-image: radial-gradient(circle at 1px 1px, hsl(var(--foreground) / 0.5) 1px, transparent 0);
+}

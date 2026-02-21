@@ -1,0 +1,12 @@
+{
+  "network": "testnet",
+  "generatedAt": "2026-02-21T11:57:51.223Z",
+  "hubContractId": "CB4VZAT2U3UC6XFK3N23SKRF2NDCMP3QHJYMCHHFMZO7MRQO6DQ2EMYG",
+  "gameContractId": "CBBI3DCMFF23CYKWHN3624CAD6C6UUWIZLQEU2MJ5UFHM2ADK344OBGZ",
+  "verifierContractId": "CB5AFSZWVG4D4RALTZJ7QDVMZHSJWD3KNEFJAXLHNCVOE3SF4HIXUHBR",
+  "rpcUrl": "https://soroban-testnet.stellar.org",
+  "aliases": {
+    "game": "cf_game",
+    "verifier": "cf_ultrahonk"
+  }
+}
